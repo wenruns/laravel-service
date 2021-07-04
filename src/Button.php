@@ -26,6 +26,17 @@ class Button
 
     protected $url = 'javascript:void(0)';
 
+
+    const SIZE_SM = 'sm';
+    const SIZE_XS = 'xs';
+
+    const TYPE_DEFAULT = 'default';
+    const TYPE_WARNGING = 'warning';
+    const TYPE_DANGER = 'danger';
+    const TYPE_SUCCESS = 'success';
+    const TYPE_PRIMARY = 'primary';
+    const TYPE_INFO = 'info';
+
     /**
      * Button constructor.
      * @param $text

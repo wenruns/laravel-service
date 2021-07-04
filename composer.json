@@ -24,11 +24,10 @@
     "encore/laravel-admin": ">=1.8.12"
   },
   "require-dev": {
-    
   },
   "autoload": {
     "psr-4": {
-      "WenRuns\\Server": "src"
+      "WenRuns\\Service\\": "src"
     }
   },
   "autoload-dev": {

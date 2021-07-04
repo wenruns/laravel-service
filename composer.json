@@ -25,7 +25,7 @@
   },
   "autoload": {
     "psr-4": {
-      "WenRuns\\Service\\": "src"
+      "WenRuns\\Service\\": "src/"
     }
   },
   "autoload-dev": {

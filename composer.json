@@ -1,0 +1,35 @@
+{
+  "name": "wenruns/laravel-service",
+  "description": "laravel项目公共服务开发",
+  "type": "library",
+  "keywords": [
+    "wenruns",
+    "laravel",
+    "laravel-admin",
+    "Grid",
+    "Form",
+    "Show"
+  ],
+  "homepage": "https://gitee.com/wenruns/laravel-service.git",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "WenRuns",
+      "email": "1562194488@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "WenRuns\\Service\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+    }
+  }
+}

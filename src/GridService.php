@@ -6,7 +6,7 @@
  * Time: 11:16
  */
 
-namespace WenRuns\Server;
+namespace WenRuns\Service;
 
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;

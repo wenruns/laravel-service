@@ -6,7 +6,7 @@
  * Time: 11:19
  */
 
-namespace WenRuns\Server;
+namespace WenRuns\Service;
 
 
 use Encore\Admin\Admin;

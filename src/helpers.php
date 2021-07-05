@@ -19,7 +19,7 @@ if (!function_exists('buttons')) {
                 call_user_func($clusre, $button);
             }
             if ($toString) {
-                $html[$key] = $button->render();
+                $html .= $button->render();
             } else {
                 $html[$key] = $button;
             }

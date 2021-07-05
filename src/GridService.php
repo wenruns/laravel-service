@@ -58,15 +58,19 @@ class GridService
     protected $batchActionsClosure = null;
 
     /**
-     * GridServer constructor.
+     * GridService constructor.
      * @param $modelClass
      * @param string $girdClass
      */
-    public function __construct($modelClass, $girdClass = Grid::class)
+    public function __construct($modelClass, $girdClass = \WenRuns\Service\Grid::class)
     {
         $this->grid = new $girdClass(new $modelClass);
     }
 
+    /**
+     * @param bool $disable
+     * @return $this
+     */
     public function disableBatchActions($disable = true)
     {
         $this->grid->disableBatchActions($disable);
@@ -282,7 +286,7 @@ class GridService
 
 
     /**
-     * @return mixed|null
+     * @return Grid|mixed|null
      */
     public function render()
     {
@@ -316,7 +320,7 @@ class GridService
      * @param string $gridClass
      * @return static
      */
-    public static function instance($modelClass, $gridClass = Grid::class)
+    public static function instance($modelClass, $gridClass = \WenRuns\Service\Grid::class)
     {
         return new static($modelClass, $gridClass);
     }

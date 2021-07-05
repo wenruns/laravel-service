@@ -9,7 +9,7 @@
 use WenRuns\Service\Button;
 
 
-if (function_exists('buttons')) {
+if (!function_exists('buttons')) {
     function buttons(array $buttons, \Closure $clusre, $toString = false)
     {
         $html = $toString ? '' : [];
@@ -19,7 +19,7 @@ if (function_exists('buttons')) {
                 call_user_func($clusre, $button);
             }
             if ($toString) {
-                $html[$key] = $button->render();
+                $html .= $button->render();
             } else {
                 $html[$key] = $button;
             }

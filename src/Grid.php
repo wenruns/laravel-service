@@ -10,6 +10,8 @@ use Encore\Admin\Exception\Handler;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use WenRuns\Service\Grid\Column;
+use WenRuns\Service\Grid\Tools\Header;
+use WenRuns\Service\Grid\Tools\Selector;
 
 class Grid extends \Encore\Admin\Grid
 {
@@ -185,5 +187,40 @@ class Grid extends \Encore\Admin\Grid
         }
 
         return $this->addColumn($method, $label);
+    }
+
+
+    public function selector(\Closure $closure)
+    {
+        $this->selector = new Selector();
+
+        call_user_func($closure, $this->selector);
+
+        $this->header(function () {
+            return $this->renderSelector();
+        });
+
+        return $this;
+    }
+
+    public function header(Closure $closure = null)
+    {
+        if (!$closure) {
+            return $this->header;
+        }
+
+        $this->header[] = $closure;
+
+        return $this;
+    }
+
+
+    public function renderHeader()
+    {
+        if (empty($this->header)) {
+            return '';
+        }
+
+        return (new Header($this))->render();
     }
 }

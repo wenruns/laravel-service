@@ -10,18 +10,34 @@ use WenRuns\Service\Button;
 
 
 if (!function_exists('buttons')) {
-    function buttons(array $buttons, \Closure $clusre, $toString = false)
+    function buttons(array $buttons, \Closure $clusre = null, $toString = true)
     {
         $html = $toString ? '' : [];
-        foreach ($buttons as $key => $buttonText) {
-            $button = new Button($buttonText);
+        if (isset($buttons[0])) {
+            foreach ($buttons as $key => $item) {
+                if(is_array($item)){
+                    $button = new Button(\Illuminate\Support\Arr::get($item, 'text'), $item);
+                }else{
+                    $button = new Button($item);
+                }
+                if (is_callable($clusre)) {
+                    call_user_func($clusre, $button);
+                }
+                if ($toString) {
+                    $html .= $button->render();
+                } else {
+                    $html[$key] = $button;
+                }
+            }
+        } else {
+            $button = new Button(\Illuminate\Support\Arr::get($buttons, 'text'), $buttons);
             if (is_callable($clusre)) {
                 call_user_func($clusre, $button);
             }
             if ($toString) {
-                $html .= $button->render();
+                $html = $button->render();
             } else {
-                $html[$key] = $button;
+                $html = $button;
             }
         }
         return $html;

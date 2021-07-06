@@ -260,7 +260,7 @@ class Button
         if (is_array($icon)) {
             $icon = implode(' ', $icon);
         }
-        return '<i class="fa ' . $icon . '"></i>&nbsp;&nbsp;';
+        return '<i class="fa ' . $icon . '"></i>' . (empty($this->text()) ? '' : '&nbsp;&nbsp;');
 
     }
 
@@ -408,4 +408,39 @@ HTML;
         }
         return $buttons;
     }
+
+    const SWAL_OPTIONS = [
+        'type' => 'info',
+        'title' => '确认删除？',
+        'confirmButtonText' => '确定',
+        'showCancelButton' => true,
+        'cancelButtonText' => '取消',
+    ];
+
+    public static function eventSwal(array $swalOptions=self::SWAL_OPTIONS, array $pJaxOptions = [])
+    {
+        $swalOptions = json_encode($swalOptions);
+        $pJaxOptions = json_encode($pJaxOptions);
+        return <<<SCRIPT
+function(e, pJax){
+    swal.fire({$swalOptions}).then(function(isConfirm){
+        if(isConfirm.value){
+            let options = {$pJaxOptions};
+            if(typeof options.callback == 'undefined'){
+                options.callback = function(res){
+                    if(res.status){
+                        toastr.success(res.message);
+                        $.pjax.reload("#pjax-container");
+                    }else{
+                        toastr.error(res.message);
+                    }
+                }
+            }
+            pJax(options);
+        }
+    });
+}
+SCRIPT;
+    }
+
 }

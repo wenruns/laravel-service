@@ -28,9 +28,9 @@ class InputFilter extends \Encore\Admin\Grid\Column\InputFilter
         if (empty($value)) {
             return;
         }
+        $this->input = $value;
 
         if (is_callable($this->queryClosure)) {
-            $this->input = $value;
             $this->queryClosure->call($this, $model);
             return;
         }

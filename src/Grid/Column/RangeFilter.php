@@ -36,19 +36,33 @@ class RangeFilter extends \Encore\Admin\Grid\Column\RangeFilter
             return;
         }
 
+        $this->input = $value;
         if (is_callable($this->queryClosure)) {
-            $this->input = $value;
             $this->queryClosure->call($this, $model);
             return;
         }
 
-        if (!isset($value['start'])) {
-            return $model->where($this->getColumnName(), '<', $value['end']);
-        } elseif (!isset($value['end'])) {
-            return $model->where($this->getColumnName(), '>', $value['start']);
-        } else {
-            return $model->whereBetween($this->getColumnName(), array_values($value));
+        $start = $value['start'] ?? null;
+        $end = $value['end'] ?? null;
+
+        if ($this->type == 'date') {
+            empty($start) ?: $start = strtotime($start);
+            empty($end) ?: $end = strtotime($end . ' 23:59:59');
+        } elseif ($this->type == 'time') {
+            $date = date('Y-m-d');
+            empty($start) ?: $start = strtotime($date . ' ' . $start);
+            empty($end) ?: $end = strtotime($date . ' ' . $end);
+        } elseif ($this->type == 'datetime') {
+            empty($start) ?: $start = strtotime($start);
+            empty($end) ?: $end = strtotime($end);
         }
+        if($start){
+            $model->where($this->getColumnName(),'>=', $start);
+        }
+        if($end){
+            $model->where($this->getColumnName(), '<=', $end);
+        }
+        return $model;
     }
 
     protected function addScript()

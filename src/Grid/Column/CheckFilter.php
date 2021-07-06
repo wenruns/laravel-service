@@ -30,9 +30,9 @@ class CheckFilter extends \Encore\Admin\Grid\Column\CheckFilter
         if (empty($value)) {
             return;
         }
+        $this->input = $value;
 
         if (is_callable($this->queryClosure)) {
-            $this->input = $value;
             $this->queryClosure->call($this, $model);
             return;
         }

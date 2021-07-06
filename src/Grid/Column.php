@@ -61,4 +61,5 @@ class Column extends \Encore\Admin\Grid\Column
             $this->filter->addBinding(request($this->getName()), $model);
         }
     }
+
 }

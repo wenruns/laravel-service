@@ -151,7 +151,7 @@ class Button
 
     protected function addScript()
     {
-        $event = $this->event();
+        $event = $this->eventFn();
         if ($event) {
             if (is_callable($event)) {
                 $event = $event->call($this);
@@ -159,7 +159,6 @@ class Button
             $script = <<<SCRIPT
 $(function(){
     $(".{$this->getId()}").click(function(e){
-        console.log(e);
         var pJax = {$this->pJax()};
         var fn = {$event};
         fn.call(this, e, pJax);        

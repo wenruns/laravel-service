@@ -10,11 +10,11 @@ use WenRuns\Service\Button;
 
 
 if (!function_exists('buttons')) {
-    function buttons(array $buttons, \Closure $clusre, $toString = false)
+    function buttons(array $buttons, \Closure $clusre, $toString = true, $optioins=[])
     {
         $html = $toString ? '' : [];
         foreach ($buttons as $key => $buttonText) {
-            $button = new Button($buttonText);
+            $button = new Button($buttonText, $optioins[$key] ?? $optioins);
             if (is_callable($clusre)) {
                 call_user_func($clusre, $button);
             }

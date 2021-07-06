@@ -9,6 +9,7 @@
 namespace WenRuns\Service;
 
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Arr;
 
 /**
  * Class Button
@@ -26,31 +27,91 @@ use Encore\Admin\Facades\Admin;
  */
 class Button
 {
+    /**
+     * button text
+     * @var
+     */
     protected $text;
 
+    /**
+     * custom class name
+     *
+     * @var string
+     */
     protected $class = '';
 
+    /**
+     * button size type
+     *
+     * @var string
+     */
     protected $size = 'xs';
 
+    /**
+     * button type
+     *
+     * @var string
+     */
     protected $type = 'default';
 
+    /**
+     * button icon
+     *
+     * @var string
+     */
     protected $icon = '';
 
+    /**
+     * button's style
+     *
+     * @var string
+     */
     protected $style = '';
 
+    /**
+     * button's attributes
+     *
+     * @var array
+     */
     protected $attributes = [];
 
+    /**
+     * button's id attribute
+     *
+     * @var string
+     */
     protected $id = '';
 
+    /**
+     * button jump link
+     *
+     * @var string
+     */
     protected $url = 'javascript:void(0)';
 
+    /**
+     * whether the button is hidden
+     *
+     * @var bool
+     */
     protected $hide = false;
 
+    /**
+     * button click event
+     *
+     * @var null
+     */
     protected $eventFn = null;
 
+    /**
+     * button size type options
+     */
     const SIZE_SM = 'sm';
     const SIZE_XS = 'xs';
 
+    /**
+     * button type options
+     */
     const TYPE_DEFAULT = 'default';
     const TYPE_WARNING = 'warning';
     const TYPE_DANGER = 'danger';
@@ -71,32 +132,66 @@ class Button
         }
     }
 
+    /**
+     * to set whether the button is hidden
+     *
+     * @param bool $value
+     * @return $this
+     */
     public function hide($value = true)
     {
         $this->hide = $value;
         return $this;
     }
 
+    /**
+     * to get the button url
+     * @return Button
+     */
     protected function getUrl()
     {
-        return $this->url();
+        if (empty($this->eventFn())) {
+            return $this->url();
+        }
+        return 'javascript:void(0)';
     }
 
+    /**
+     * to get the button type
+     *
+     * @return Button
+     */
     protected function getType()
     {
         return $this->type();
     }
 
+    /**
+     * to get button size type
+     *
+     * @return Button
+     */
     protected function getSize()
     {
         return $this->size();
     }
 
+    /**
+     * to get the custom class
+     *
+     * @return Button
+     */
     protected function getClass()
     {
-        return $this->class();
+        $class = $this->class();
+        return is_array($class) ? implode(' ', $class) : $class;
     }
 
+    /**
+     * to get the button id attribute
+     *
+     * @return Button
+     */
     protected function getId()
     {
         if (empty($this->id())) {
@@ -105,11 +200,21 @@ class Button
         return $this->id();
     }
 
+    /**
+     * to get the button text
+     *
+     * @return Button
+     */
     protected function getText()
     {
         return $this->text();
     }
 
+    /**
+     * to get the button style
+     *
+     * @return string|Button
+     */
     protected function getStyle()
     {
         $style = $this->style();
@@ -123,6 +228,11 @@ class Button
         return $style;
     }
 
+    /**
+     * to get the button attributes
+     *
+     * @return string|Button
+     */
     protected function getAttribute()
     {
         $attributes = $this->attributes();
@@ -136,6 +246,11 @@ class Button
         return $attributes;
     }
 
+    /**
+     * to get the button icon
+     *
+     * @return string
+     */
     protected function getIcon()
     {
         $icon = $this->icon();
@@ -149,9 +264,14 @@ class Button
 
     }
 
+    /**
+     * to set the button click event
+     *
+     * @return $this
+     */
     protected function addScript()
     {
-        $event = $this->event();
+        $event = $this->eventFn();
         if ($event) {
             if (is_callable($event)) {
                 $event = $event->call($this);
@@ -159,10 +279,10 @@ class Button
             $script = <<<SCRIPT
 $(function(){
     $(".{$this->getId()}").click(function(e){
-        console.log(e);
+        e.preventDefault();
         var pJax = {$this->pJax()};
         var fn = {$event};
-        fn.call(this, e, pJax);        
+        fn.call(this, e, pJax);
     });
 });
 SCRIPT;
@@ -171,6 +291,11 @@ SCRIPT;
         return $this;
     }
 
+    /**
+     * the pJax request function
+     *
+     * @return string
+     */
     protected function pJax()
     {
         $token = csrf_token();
@@ -213,6 +338,11 @@ SCRIPT;
 
     }
 
+    /**
+     * output the button generates result
+     *
+     * @return string
+     */
     public function render()
     {
         if ($this->hide) {
@@ -222,10 +352,24 @@ SCRIPT;
         $this->addScript();
 
         return <<<HTML
-<a href="{$this->getUrl()}" class="btn btn-{$this->getType()} btn-{$this->getSize()} {$this->getClass()} {$this->getId()}" id="{$this->getId()}" title="{$this->getText()}" style="margin:2px;{$this->getStyle()}" {$this->getAttribute()}>{$this->getIcon()}{$this->getText()}</a>
+<a href="{$this->getUrl()}"
+   data-uri="{$this->url()}"
+   class="btn btn-{$this->getType()} btn-{$this->getSize()} {$this->getClass()} {$this->getId()}"
+   id="{$this->getId()}"
+   title="{$this->getText()}"
+   style="margin:2px;{$this->getStyle()}"
+   {$this->getAttribute()}>
+        {$this->getIcon()}{$this->getText()}
+</a>
 HTML;
     }
 
+    /**
+     *
+     * @param $name
+     * @param $arguments
+     * @return $this|null
+     */
     public function __call($name, $arguments)
     {
         if (empty($arguments)) {
@@ -233,5 +377,35 @@ HTML;
         }
         $this->$name = $arguments[0] ?? null;
         return $this;
+    }
+
+    /**
+     * statically method to create the button
+     *
+     * @param array $options
+     * @param bool $toString
+     * @return array|string|static
+     */
+    public static function create(array $options, $toString = true)
+    {
+        $buttons = $toString ? '' : null;
+        if (isset($options[0])) {
+            foreach ($options as $k => $item) {
+                $button = new static(Arr::get($item, 'text'), $item);
+                if ($toString) {
+                    $buttons .= $button->render();
+                } else {
+                    $buttons[] = $button;
+                }
+            }
+        } else {
+            $button = new static(Arr::get($options, 'text'), $options);
+            if ($toString) {
+                $buttons = $button->render();
+            } else {
+                $buttons = $button;
+            }
+        }
+        return $buttons;
     }
 }

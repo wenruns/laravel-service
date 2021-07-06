@@ -73,11 +73,11 @@
                             $active = in_array($value, \Illuminate\Support\Arr::get($selected, $column, []));
                         @endphp
                         <li>
-                            <a href="{{ \Encore\Admin\Grid\Tools\Selector::url($column, $value, true, $selector['params']??null) }}"
+                            <a href="{{ \WenRuns\Service\Grid\Tools\Selector::url($column, $value, true, $selector) }}"
                                class="{{$active ? 'active' : ''}}">{{ $option }}</a>
                             @if(!$active && $selector['type'] == 'many')
                                 &nbsp;
-                                <a href="{{ \Encore\Admin\Grid\Tools\Selector::url($column, $value, false, $selector['params']??null) }}" class="add"><i
+                                <a href="{{ \WenRuns\Service\Grid\Tools\Selector::url($column, $value, false, $selector) }}" class="add"><i
                                         class="fa fa-plus-square-o"></i></a>
                             @else
                                 <a style="visibility: hidden;"><i class="fa fa-plus-square-o"></i></a>
@@ -85,7 +85,7 @@
                         </li>
                     @endforeach
                     <li>
-                        <a href="{{ \Encore\Admin\Grid\Tools\Selector::url($column, null, false, $selector['params']??null) }}" class="clear"><i
+                        <a href="{{ \WenRuns\Service\Grid\Tools\Selector::url($column, null, false, $selector) }}" class="clear"><i
                                 class="fa fa-trash"></i></a>
                     </li>
                 </ul>

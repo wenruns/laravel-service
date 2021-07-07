@@ -763,6 +763,7 @@ function iframeScript(){
         // 执行script脚本
         scripts.forEach((script)=>{
             eval(script.innerHTML);
+            console.log(script.innerHTML);
         });
         iframe.remove();
         {$formSubmit}
@@ -833,11 +834,36 @@ function(e, pJax){
     let iframe = document.getElementById("swal2-page-iframe");
     function iframeLoaded(e){
         let iframeDocument = iframe.contentDocument || window.frames["iframe-swal2"].document;
-        let documentHeight = iframeDocument.querySelector("#pjax-container").offsetHeight;
+        let pJaxContainerEle = iframeDocument.querySelector("#pjax-container #app");
+        let documentHeight = pJaxContainerEle.offsetHeight;
         iframe.height = documentHeight + 'px';
+
+//
+//      // Firefox和Chrome早期版本中带有前缀
+//var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver
+//
+//// 选择目标节点
+//var target = document.querySelector('#some-id');
+//
+//// 创建观察者对象
+//var observer = new MutationObserver(function(mutations) {
+//    console.log(111, mutations);
+//});
+//
+//// 配置观察选项:
+//var config = { attributes: true, childList: true, characterData: true }
+//
+//// 传入目标节点和观察选项
+//observer.observe(pJaxContainerEle, config);
+//
+//// 随后,你还可以停止观察
+////observer.disconnect();
+
+
         document.querySelector(".swal2-page-iframe-loading").style.display = 'none';
-        let submitButtons = iframeDocument.querySelectorAll("button[type='submit']");
-        if(`{$submitEvent}`){
+        let submitEvent = `{$submitEvent}`
+        if(submitEvent){
+            let submitButtons = iframeDocument.querySelectorAll("button[type='submit']");
             submitButtons.forEach(button=>{
                 button.addEventListener('click', function(event){
                     try{
@@ -853,8 +879,8 @@ function(e, pJax){
                         });
                         e = event || window.event;
                         e.preventDefault();
-                        let submitEvent = {$submitEvent};
-                        submitEvent.call(this, form, pJax);
+                        eval('let fn = '+submitEvent);
+                        fn.call(this, form, pJax);
                         return false;
                     }catch(e){
                         console.info(e);

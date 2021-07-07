@@ -1,0 +1,39 @@
+{
+  "name": "wenruns/laravel-service",
+  "description": "description...",
+  "type": "library",
+  "keywords": [
+    "laravel-admin",
+    "extension"
+  ],
+  "homepage": "https://github.com/wenruns/laravel-service",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "WenRuns",
+      "email": "1562194488@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0",
+    "encore/laravel-admin": "~1.6"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "WenRuns\\Laravel\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "WenRuns\\Laravel\\LaravelServiceProvider"
+      ]
+    }
+  }
+}

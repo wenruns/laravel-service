@@ -324,4 +324,52 @@ class GridService
     {
         return new static($modelClass, $gridClass);
     }
+
+
+    public function enableButtonIframe($enable = true)
+    {
+        if ($enable) {
+            $this->addScript();
+        }
+        return $this;
+    }
+
+    protected function addScript()
+    {
+        $pjax = Button::pJax();
+        $eventPageIframe = Button::eventPageIframe('', $this->submitEvent());
+        $script = <<<SCRIPT
+$("a[href^='http'][target!='_blank']").click(function(event){
+    var e = event || window.event;
+    e.preventDefault();
+    let fn = {$eventPageIframe};
+    fn.call(this, e, {$pjax});
+});
+SCRIPT;
+        Admin::script($script);
+    }
+
+    protected function submitEvent(){
+        return <<<SCRIPT
+function(form, pJax){
+    let formData = new FormData(form);
+    let url = form.getAttribute("action");
+    pJax({
+        url: url,
+        data: formData,
+        method: form.getAttribute("method"),
+        callback: function(res){
+            if(res.status){
+                swal.close();
+                $.pjax.reload("#pjax-container");
+                toastr.success(res.message);
+            }else{
+                toastr.error(res.message);
+            }
+        },
+    });
+}
+SCRIPT;
+
+    }
 }

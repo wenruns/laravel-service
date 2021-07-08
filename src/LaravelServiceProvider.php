@@ -2,6 +2,7 @@
 
 namespace WenRuns\Laravel;
 
+use Encore\Admin\Facades\Admin;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelServiceProvider extends ServiceProvider
@@ -11,8 +12,8 @@ class LaravelServiceProvider extends ServiceProvider
      */
     public function boot(Laravel $extension)
     {
-        if (! Laravel::boot()) {
-            return ;
+        if (!Laravel::boot()) {
+            return;
         }
 
         if ($views = $extension->views()) {
@@ -28,6 +29,16 @@ class LaravelServiceProvider extends ServiceProvider
 
         $this->app->booted(function () {
             Laravel::routes(__DIR__.'/../routes/web.php');
+        });
+    }
+
+
+    public function handle()
+    {
+        Admin::booting(function () {
+            Admin::js('vendor/wenruns/laravel-service/layer/layer.js');
+            Admin::js('vendor/wenruns/laravel-service/layer/mobile/layer.js');
+            Admin::css('vendor/wenruns/laravel-service/layer/mobile/need/layer.css');
         });
     }
 }

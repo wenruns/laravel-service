@@ -26,7 +26,7 @@ use phpDocumentor\Reflection\Types\Self_;
  * @method Button url($value = null)
  * @method Button id($value = null)
  * @method Button eventFn($value = null)
- * @package WenRuns\Service
+ * @package WenRuns\Services
  */
 class Button
 {
@@ -122,6 +122,8 @@ class Button
     const TYPE_PRIMARY = 'primary';
     const TYPE_INFO = 'info';
 
+    protected static $hasLoadLayer = false;
+
     /**
      * Button constructor.
      * @param $text
@@ -133,6 +135,25 @@ class Button
         foreach ($options as $key => $value) {
             $this->$key = $value;
         }
+        $this->checkAssets();
+    }
+
+    public function checkAssets()
+    {
+        if (self::$hasLoadLayer) {
+            return $this;
+        }
+        $js = Admin::js()->getData()['js'] ?? [];
+        foreach ($js as $file) {
+            if (strpos($file, 'layer.js') !== false) {
+                self::$hasLoadLayer = true;
+                return $this;
+            }
+        }
+        Admin::js('/vendor/wenruns/laravel-service/layer/layer.js');
+        Admin::js('/vendor/wenruns/laravel-service/layer/mobile/layer.js');
+        Admin::css('/vendor/wenruns/laravel-service/layer/mobile/need/layer.css');
+        return $this;
     }
 
     /**
@@ -492,16 +513,16 @@ $(function(){
                 transform: rotate(-360deg);
             }
         }
-
         .select2-container.select2-container--default.select2-container--open{
-            z-index: 10000;
+            z-index: 999999999999;
         }
-        .swal2-popup #swal2-content{
-            text-align: left !important;
-        }
-        .swal2-popup .iframe-loading svg{
+        .layui-layer-content .iframe-loading svg{
             animation: swal2loading 1.2s infinite ease-in-out;
             -webkit-animation: swal2loading 1.2s infinite ease-in-out;
+        }
+
+        .layui-layer-content .icheck{
+            margin: 0px 20px;
         }
     `;
     document.querySelector('head').append(styleEle);
@@ -515,10 +536,14 @@ SCRIPT;
      * @param Form $form
      * @param string $script
      * @param string $width
+     * @param string $height
      * @return string
      */
-    public static function eventForm(Form $form, $script = '', $width = '80%')
+    public static function eventForm(Form $form, $options = [])
     {
+        $options['title'] = $options['title'] ?? '表单';
+        $options = self::checkLayerOptions($options);
+
         $form->tools(function (Form\Tools $tools) {
             $tools->disableList();
             $tools->disableDelete();
@@ -532,391 +557,200 @@ SCRIPT;
         self::cssHandle();
         $fields = $form->builder()->fields();
         $formHtml = self::htmlHandle($form->render());
-        $fields->each(function ($field) use (&$script) {
+        $fields->each(function ($field) use (&$options) {
             $field->render();
-            $script .= $field->getScript() . ' ';
+            $options['script'] .= $field->getScript() . ' ';
         });
-        $moveHeader = self::moveHeader();
-        $closeButton = self::closeButton();
-        $formSubmit = self::formSubmit();
+        $area = is_array($options['area']) ? json_encode($options['area']) : $options['area'];
         return <<<SCRIPT
 function(e, pJax){
-    swal.fire({
-        showConfirmButton: false,
-        showCancelButton: false,
-        html: '{$formHtml}',
-        width: '{$width}',
-        animation: "slide-from-top",
-    });
-    {$closeButton}
-    {$moveHeader}
-    {$formSubmit}
-    {$script}
-}
-SCRIPT;
-    }
-
-    protected static function formSubmit()
-    {
-        return <<<SCRIPT
-function formSubmit(){
-    $('.swal2-content form button[type="submit"]').click(function(event){
-        try{
-            let form = document.querySelector(".swal2-content form");
-            let requiredEles = form.querySelectorAll("[name][required]");
-            requiredEles.forEach(ele=>{
-                if(!ele.value){
-                    throw new Error(ele.name+'的值不能为空');
+    layer.open({
+        type: 1,
+        title: '{$options['title']}',
+        offset: '{$options['offset']}',
+        area: {$area},
+        shadeClose: {$options['shadeClose']}, //点击遮罩关闭
+        content: '{$formHtml}',
+        anim: {$options['anim']}, //平滑放大。默认
+        shade: {$options['shade']},
+        maxmin: {$options['maxmin']},
+        success: function(layer0, index){
+            $('.layui-layer-content form button[type="submit"]').click(function(event){
+                try{
+                    let form = document.querySelector(".layui-layer-content form");
+                    let requiredEles = form.querySelectorAll("[name][required]");
+                    requiredEles.forEach(ele=>{
+                        if(!ele.value){
+                            throw new Error(ele.name+'的值不能为空');
+                        }
+                    });
+                    var e = event || window.event;
+                    e.preventDefault();
+                    let formData = new FormData(form);
+                    let url = form.getAttribute("action");
+                    pJax({
+                        url: url,
+                        data: formData,
+                        method: form.getAttribute("method"),
+                        callback: function(res){
+                            if(res.status){
+                                layer.closeAll();
+                                $.pjax.reload("#pjax-container");
+                                toastr.success(res.message);
+                            }else{
+                                toastr.error(res.message);
+                            }
+                        },
+                    });
+                    return false;
+                }catch(e){
                 }
             });
-            var e = event || window.event;
-            e.preventDefault();
-            let formData = new FormData(form);
-            let url = form.getAttribute("action");
-            pJax({
-                url: url,
-                data: formData,
-                method: form.getAttribute("method"),
-                callback: function(res){
-                    if(res.status){
-                        swal.close();
-                        $.pjax.reload("#pjax-container");
-                        toastr.success(res.message);
-                    }else{
-                        toastr.error(res.message);
-                    }
-                },
-            });
-            return false;
-        }catch(e){
-        }
+            {$options['script']}
+        },
     });
 }
-formSubmit();
 SCRIPT;
-
     }
 
-    /**
-     * 将show表单头或form表单头移动到swal2的头元素中
-     * @return string
-     */
-    protected static function moveHeader()
-    {
-        return <<<SCRIPT
-function moveHeader(){
-    let swalHeader = document.querySelector(".swal2-header");
-    let formHeader = document.querySelector(".swal2-content .box-header");
-    swalHeader.append(formHeader);
-    formHeader.style.width = '100 % ';
-}
-moveHeader();
-SCRIPT;
-
-    }
 
     /**
      * 弹出show表单
      * @param Show $show
      * @param string $script
      * @param string $width
+     * @param string $height
      * @return string
      */
-    public static function eventShow(Show $show, $script = '', $width = '80%')
+    public static function eventShow(Show $show, $options = [])
     {
+        $options['title'] = $options['title'] ?? '详情';
+        $options = self::checkLayerOptions($options);
         $show->panel()->tools(function (Show\Tools $tools) {
             $tools->disableDelete();
             $tools->disableList();
             $tools->disableEdit();
         });
         $html = self::htmlHandle($show->render());
-        $moveHeader = self::moveHeader();
-        $closeButton = self::closeButton();
+        $area = is_array($options['area']) ? json_encode($options['area']) : $options['area'];
         return <<<SCRIPT
 function(e, pJax){
-    swal.fire({
-        showConfirmButton: false,
-        showCancelButton: false,
-        html: '{$html}',
-        width: '{$width}',
-        animation: "slide-from-top",
+    layer.open({
+        type: 1,
+        title: '{$options['title']}',
+        offset: '{$options['offset']}',
+        area: {$area},
+        shadeClose: {$options['shadeClose']}, //点击遮罩关闭
+        content: '{$html}',
+        anim: {$options['anim']}, //平滑放大。默认
+        shade: {$options['shade']},
+        maxmin: {$options['maxmin']},
+        success: function(layer0, index){
+            {$options['script']}
+        }
     });
-    {$closeButton}
-    {$moveHeader}
-    {$script}
 }
 SCRIPT;
     }
 
-    /**
-     * 关闭按钮
-     * @return string
-     */
-    protected static function closeButton($top = '-20px', $right='-20px')
+    protected static function checkLayerOptions(array $options)
     {
-        return <<<SCRIPT
-function closeButton(){
-    let swalHeader = document.querySelector(".swal2-header");
-    swalHeader.style.position = 'relative';
-    swalHeader.innerHTML = '';
-    let closeBtn = document.createElement('i');
-    swalHeader.append(closeBtn);
-    closeBtn.classList.value = 'fa fa-times';
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = "{$top}";
-    closeBtn.style.right = "{$right}";
-    closeBtn.style.padding = "4px 5px";
-    closeBtn.style.border = "1px solid rgba(0, 0, 0, 0.4)";
-    closeBtn.style["border-radius"] = "20px";
-    closeBtn.style.background = "white";
-    closeBtn.style.cursor = "pointer";
-    closeBtn.style["z-index"] = "999";
-    closeBtn.style.color = "red";
-    $(closeBtn).click(function(e){
-        swal.close();
-    });
-}
-closeButton();
-SCRIPT;
-
+        return [
+            'submitEvent' => $options['submit'] ?? '',
+            'script' => $options['script'] ?? '',
+            'area' => $options['area'] ?? ['80vw', '90vh'],
+            'offset' => $options['offset'] ?? '5px',
+            'anim' => $options['anim'] ?? 1,
+            'title' => $options['title'] ?? false,
+            'shadeClose' => $options['shadeClose'] ?? true,
+            'shade' => $options['shade'] ?? 0.3,
+            'maxmin' => $options['maxmin'] ?? true, //开启最大化最小化按钮
+        ];
     }
+
 
     /**
      * iframe方式加载页面
      * @param $url
-     * @param string $script
+     * @param string $submitEvent
      * @param string $width
+     * @param string $height
      * @return string
      */
-    public static function eventIframe($url, $script = '', $width = '80%')
+    public static function eventIframe($url, $options = [])
     {
+        $options['title'] = $options['title'] ?? $url;
+        $options = self::checkLayerOptions($options);
+        $area = is_array($options['area']) ? json_encode($options['area']) : $options['area'];
         self::cssHandle();
-        $html = self::htmlHandle(self::iframeHtml($url));
-        $iframeScript = self::iframeScript();
-        $closeButton = self::closeButton();
         return <<<SCRIPT
 function(e, pJax){
-    swal.fire({
-        showConfirmButton: false,
-        showCancelButton: false,
-        html: `{$html}`,
-        width: '{$width}',
-        animation: "slide-from-top",
-    });
-    {$iframeScript}
-    {$closeButton}
-    {$script}
-}
-SCRIPT;
-    }
-
-    /**
-     * iframe加载完成后js处理
-     * @return string
-     */
-    protected static function iframeScript()
-    {
-        $formSubmit = self::formSubmit();
-        return <<<SCRIOPT
-function iframeScript(){
-    let iframeContent = document.querySelector(".swal2-content #iframe-content");
-    let iframe = iframeContent.querySelector("iframe");
-    let loadingEle = document.querySelector(".swal2-content .iframe-loading");
-
-    function afterOnload(e){
-        // 获取iframe的document对象
-        let iframeDocument = iframe.contentDocument || window.frames["iframe-swal2"].document;
-        // 获取需要执行的script脚本
-        let scripts = iframeDocument.querySelectorAll(".content-wrapper script[data-exec-on-popstate]");
-        // 获取用户自定义css
-        let styles = iframeDocument.querySelectorAll(".content-wrapper style[type='text/css']");
-        // 加载用户自定义css
-        styles.forEach((ele)=>{
-            iframeContent.append(ele);
-        });
-        // 新建iframe内容容器
-        let content = document.createElement("div");
-        // 获取iframe的内容元素
-        let iframeContentEle = iframeDocument.querySelector("#app .content .box.box-info");
-        // 更新iframe内容容器的属性
-        Array.from(iframeContentEle.attributes).forEach((item)=>{
-            content.setAttribute(item.name, item.value);
-        });
-        // 更新iframe内容容器的内容
-        content.innerHTML = iframeContentEle.innerHTML;
-        // 加载iframe内容
-        iframeContent.append(content);
-        loadingEle.style.display = 'none';
-        // form表单select控件元素
-        let selectEles = content.querySelectorAll("select[name]");
-        // form表单number控件元素
-        let numberEles = content.querySelectorAll("input.initialized[name]");
-        // 去掉iframe中生成的select控件代码
-        selectEles.forEach((ele)=>{
-            ele.parentElement.innerHTML = ele.outerHTML;
-        });
-        // 去掉iframe中生成的number控件代码
-        numberEles.forEach(ele=>{
-            ele.classList.remove("initialized");
-            ele.parentElement.innerHTML = ele.outerHTML;
-        });
-        // 执行script脚本
-        scripts.forEach((script)=>{
-            eval(script.innerHTML);
-            console.log(script.innerHTML);
-        });
-        iframe.remove();
-        {$formSubmit}
-    }
-    if (iframe.attachEvent) {
-        iframe.attachEvent("onload", function(e) {
-            //iframe加载完成后你需要进行的操作
-            afterOnload(e);
-        });
-    } else {
-        iframe.onload = function(e) {
-            //iframe加载完成后你需要进行的操作
-            afterOnload(e);
-        };
-    }
-}
-iframeScript();
-SCRIOPT;
-
-    }
-
-    /**
-     *  iframe页面
-     * @param $url
-     * @return string
-     */
-    protected static function iframeHtml($url)
-    {
-        return <<<HTML
-<div id="iframe-content" style="min-height: 300px;display: flex;align-items: center;justify-content: center;">
-    <iframe name="iframe-swal2" id="iframe-swal2" src="{$url}" frameborder="0" width="100%" hidden></iframe>
-    <div class="iframe-loading" style="text-align: center;padding-top: 20px;">
-        <svg t="1625624104640"
-             class="icon"
-             viewBox="0 0 1024 1024"
-             version="1.1"
-             xmlns="http://www.w3.org/2000/svg"
-             p-id="1900"
-             width="64"
-             height="64">
-            <path d="M511.505 0C238.13 0 16.516 222.175 16.516 496.244c0 274.068 221.614 496.243 494.989 496.243 273.374 0 494.988-222.175 494.988-496.243C1006.493 222.175 784.913 0 511.505 0z m0 942.84c-246.058 0-445.507-199.945-445.507-446.63 0-246.684 199.45-446.629 445.507-446.629 246.057 0 445.506 199.945 445.506 446.63 0 246.684-199.45 446.629-445.506 446.629z" p-id="1901"></path><path d="M514.709 281.963c-51.167 0-102.235 19.853-141.246 59.558-38.945 39.671-58.5 91.73-58.5 143.723 0 51.993 19.522 104.051 58.5 143.723 39.01 39.705 90.079 59.557 141.246 59.557 51.1 0 102.168-19.852 141.18-59.557 38.945-39.672 58.467-91.73 58.467-143.723 0-51.993-19.522-104.052-58.467-143.723-39.012-39.705-90.08-59.558-141.18-59.558z m14.336 47.6c3.336-12.618 16.152-20.183 28.606-16.78 12.486 3.402 19.819 16.416 16.483 29.068-3.337 12.684-16.087 20.249-28.54 16.846-12.486-3.402-19.886-16.417-16.55-29.134zM373.198 546.618c-12.387 3.435-25.203-4.063-28.54-16.748-3.336-12.684 3.997-25.732 16.484-29.134 12.486-3.37 25.27 4.129 28.606 16.846 3.336 12.652-4.063 25.633-16.55 29.036z m16.417-154.327c-9.116-9.282-9.116-24.312 0-33.594 9.15-9.282 23.883-9.282 33 0 9.084 9.282 9.084 24.312 0 33.594-9.117 9.315-23.883 9.315-33 0zM496.31 638.282c-3.337 12.619-16.153 20.183-28.54 16.78-12.486-3.402-19.886-16.416-16.55-29.068 3.337-12.684 16.153-20.248 28.607-16.846 12.42 3.402 19.819 16.417 16.483 29.134z m-52.224-84.463c-37.888-38.648-37.888-101.145 0-139.727a95.9 95.9 0 0 1 137.249 0c37.888 38.582 37.888 101.112 0 139.727a95.9 95.9 0 0 1-137.25 0z m191.752 55.329c-9.15 9.249-23.948 9.249-33 0-9.116-9.282-9.116-24.345 0-33.594 9.085-9.315 23.883-9.315 33 0 9.05 9.25 9.05 24.279 0 33.594z m44.924-171.173c3.336 12.717-4.063 25.732-16.55 29.134-12.386 3.37-25.203-4.129-28.54-16.846-3.335-12.652 4.064-25.7 16.484-29.102 12.486-3.336 25.27 4.13 28.606 16.814zM210.085 197.4l21.67 142.006 36.6-5.681-21.67-142.039-36.6 5.715zM398.006 863.794l23.221 29.431 109.238-89.484-23.222-29.432-109.237 89.485zM777.546 308.984l-13.41 35.18 129.981 51.265 13.411-35.18-129.982-51.265zM115.514 606.637l131.303 51.795 13.411-35.18-131.303-51.794-13.411 35.18zM627.613 103.853l-23.189-29.431-105.769 86.643 23.189 29.399 105.769-86.61zM756.934 636.201l21.273 139.925 36.699-5.78L793.6 630.387l-36.666 5.813z" p-id="1902"></path>
-        </svg>
-        <div style="color: grey;padding: 20px;font-size: 18px;">努力加载中...</div>
-    </div>
-</div>
-HTML;
-    }
-
-    public static function eventPageIframe($url = null, $submitEvent = '', $width = '80%')
-    {
-        self::cssHandle();
-        $closeButton = self::closeButton('-10px', '-10px');
-        $html = self::htmlHandle(self::pageIframeHtml());
-        return <<<SCRIPT
-function(e, pJax){
-    let url = `{$url}`;
-    if(!url){
-        url = e.currentTarget.href;
-    }
-    console.log(url, e.currentTarget);
-    swal.fire({
-        showConfirmButton: false,
-        showCancelButton: false,
-        html: `{$html}`,
-        width: '{$width}',
-    });
-    document.querySelector(".swal2-popup.swal2-modal.swal2-show").style.padding = '2px';
-    let iframe = document.getElementById("swal2-page-iframe");
-    function iframeLoaded(e){
-        let iframeDocument = iframe.contentDocument || window.frames["iframe-swal2"].document;
-        let pJaxContainerEle = iframeDocument.querySelector("#pjax-container #app");
-        let documentHeight = pJaxContainerEle.offsetHeight;
-        iframe.height = documentHeight + 'px';
-
-
-      // Firefox和Chrome早期版本中带有前缀
-var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver
-// 创建观察者对象
-var observer = new MutationObserver(function(mutations) {
-    console.log(111, mutations);
-});
-// 配置观察选项:
-var config = { attributes: true, childList: true, characterData: true }
-// 传入目标节点和观察选项
-observer.observe(pJaxContainerEle, config);
-// 随后,你还可以停止观察
-//observer.disconnect();
-
-
-        document.querySelector(".swal2-page-iframe-loading").style.display = 'none';
-        let submitEvent = `{$submitEvent}`
-        if(submitEvent){
-            let submitButtons = iframeDocument.querySelectorAll("button[type='submit']");
-            submitButtons.forEach(button=>{
-                button.addEventListener('click', function(event){
+    let index = layer.open({
+        type: 2,
+        title: '{$options['title']}',
+        offset: '{$options['offset']}',
+        area: {$area},
+        shadeClose: {$options['shadeClose']}, //点击遮罩关闭
+        content: '{$url}',
+        anim: {$options['anim']}, //平滑放大。默认
+        shade: {$options['shade']},
+        maxmin: {$options['maxmin']},
+        success: function(layer0, index){
+            let ele = layer0[0];
+            let iframe = ele.querySelector('iframe');
+            let iframeDocument = iframe.contentDocument || window.frames[iframe.name].document || ele;
+            $(iframeDocument).on('click','form button[type="submit"]',function(event){
+                var submit = function(){
                     try{
                         let form = event.currentTarget.parentElement;
                         while(form.tagName != 'FORM'){
                             form = form.parentElement;
                         }
                         let requiredEles = form.querySelectorAll("[name][required]");
-                        requiredEles.forEach(ele => {
+                        requiredEles.forEach(ele=>{
                             if(!ele.value){
-                                throw new Error(ele.name+' 不能为空！');
+                                throw new Error(ele.name+'的值不能为空');
                             }
                         });
-                        e = event || window.event;
+                        var e = event || window.event;
                         e.preventDefault();
-                        eval('let fn = '+submitEvent);
-                        fn.call(this, form, pJax);
+                        let formData = new FormData(form);
+                        let url = form.getAttribute("action");
+                        pJax({
+                            url: url,
+                            data: formData,
+                            method: form.getAttribute("method"),
+                            callback: function(res){
+                                if(res.status){
+                                    layer.closeAll();
+                                    $.pjax.reload("#pjax-container");
+                                    toastr.success(res.message);
+                                }else{
+                                    toastr.error(res.message);
+                                }
+                            },
+                        });
                         return false;
                     }catch(e){
-                        console.info(e);
+                        console.error(e);
                     }
-                });
+                }
+                let submitEvent = `{$options['submitEvent']}`;
+                if(submitEvent){
+                    eval(`var fn = ` + submitEvent);
+                    var close = function(){
+                        layer.close(index);
+                    }
+                    fn.call(this, {e:event, pJax, submit, close});
+                }else{
+                    submit();
+                }
             });
         }
-    }
-    if (iframe.attachEvent) {
-        iframe.attachEvent("onload", function(e) {
-            //iframe加载完成后你需要进行的操作
-            iframeLoaded(e);
-        });
-    } else {
-        iframe.onload = function(e) {
-            //iframe加载完成后你需要进行的操作
-            iframeLoaded(e);
-        };
-    }
-    {$closeButton}
+    });
 }
 SCRIPT;
     }
 
-    protected static function pageIframeHtml(){
-        return <<<HTML
-<iframe name="swal2-page-iframe" id="swal2-page-iframe" src="`+url+`" frameborder="0"  width="100%" scrolling="no" height="0px"></iframe>
-<div class="swal2-page-iframe-loading" style="min-height: 50vh;display: flex;justify-content: center;align-items: center;">
-     <div class="iframe-loading" style="text-align: center;padding-top: 20px;">
-         <svg t="1625624104640"
-              class="icon"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="1900"
-              width="64"
-              height="64">
-             <path d="M511.505 0C238.13 0 16.516 222.175 16.516 496.244c0 274.068 221.614 496.243 494.989 496.243 273.374 0 494.988-222.175 494.988-496.243C1006.493 222.175 784.913 0 511.505 0z m0 942.84c-246.058 0-445.507-199.945-445.507-446.63 0-246.684 199.45-446.629 445.507-446.629 246.057 0 445.506 199.945 445.506 446.63 0 246.684-199.45 446.629-445.506 446.629z" p-id="1901"></path><path d="M514.709 281.963c-51.167 0-102.235 19.853-141.246 59.558-38.945 39.671-58.5 91.73-58.5 143.723 0 51.993 19.522 104.051 58.5 143.723 39.01 39.705 90.079 59.557 141.246 59.557 51.1 0 102.168-19.852 141.18-59.557 38.945-39.672 58.467-91.73 58.467-143.723 0-51.993-19.522-104.052-58.467-143.723-39.012-39.705-90.08-59.558-141.18-59.558z m14.336 47.6c3.336-12.618 16.152-20.183 28.606-16.78 12.486 3.402 19.819 16.416 16.483 29.068-3.337 12.684-16.087 20.249-28.54 16.846-12.486-3.402-19.886-16.417-16.55-29.134zM373.198 546.618c-12.387 3.435-25.203-4.063-28.54-16.748-3.336-12.684 3.997-25.732 16.484-29.134 12.486-3.37 25.27 4.129 28.606 16.846 3.336 12.652-4.063 25.633-16.55 29.036z m16.417-154.327c-9.116-9.282-9.116-24.312 0-33.594 9.15-9.282 23.883-9.282 33 0 9.084 9.282 9.084 24.312 0 33.594-9.117 9.315-23.883 9.315-33 0zM496.31 638.282c-3.337 12.619-16.153 20.183-28.54 16.78-12.486-3.402-19.886-16.416-16.55-29.068 3.337-12.684 16.153-20.248 28.607-16.846 12.42 3.402 19.819 16.417 16.483 29.134z m-52.224-84.463c-37.888-38.648-37.888-101.145 0-139.727a95.9 95.9 0 0 1 137.249 0c37.888 38.582 37.888 101.112 0 139.727a95.9 95.9 0 0 1-137.25 0z m191.752 55.329c-9.15 9.249-23.948 9.249-33 0-9.116-9.282-9.116-24.345 0-33.594 9.085-9.315 23.883-9.315 33 0 9.05 9.25 9.05 24.279 0 33.594z m44.924-171.173c3.336 12.717-4.063 25.732-16.55 29.134-12.386 3.37-25.203-4.129-28.54-16.846-3.335-12.652 4.064-25.7 16.484-29.102 12.486-3.336 25.27 4.13 28.606 16.814zM210.085 197.4l21.67 142.006 36.6-5.681-21.67-142.039-36.6 5.715zM398.006 863.794l23.221 29.431 109.238-89.484-23.222-29.432-109.237 89.485zM777.546 308.984l-13.41 35.18 129.981 51.265 13.411-35.18-129.982-51.265zM115.514 606.637l131.303 51.795 13.411-35.18-131.303-51.794-13.411 35.18zM627.613 103.853l-23.189-29.431-105.769 86.643 23.189 29.399 105.769-86.61zM756.934 636.201l21.273 139.925 36.699-5.78L793.6 630.387l-36.666 5.813z" p-id="1902"></path>
-         </svg>
-         <div style="color: grey;padding: 20px;font-size: 18px;">努力加载中...</div>
-     </div>
-</div>
-HTML;
-    }
 
 }

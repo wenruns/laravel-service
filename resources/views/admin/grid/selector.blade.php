@@ -1,5 +1,8 @@
+@php
+use \WenRuns\Laravel\Admin\Grid\Tools\Selector;
+use \Illuminate\Support\Arr;
+@endphp
 <style>
-
     .grid-selector .wrap {
         position: relative;
         line-height: 34px;
@@ -70,14 +73,14 @@
                 <ul>
                     @foreach($selector['options'] as $value => $option)
                         @php
-                            $active = in_array($value, \Illuminate\Support\Arr::get($selected, $column, []));
+                            $active = in_array($value, Arr::get($selected, $column, []));
                         @endphp
                         <li>
-                            <a href="{{ \WenRuns\Service\Grid\Tools\Selector::url($column, $value, true, $selector) }}"
+                            <a href="{{ Selector::url($column, $value, true, $selector) }}"
                                class="{{$active ? 'active' : ''}}">{{ $option }}</a>
                             @if(!$active && $selector['type'] == 'many')
                                 &nbsp;
-                                <a href="{{ \WenRuns\Service\Grid\Tools\Selector::url($column, $value, false, $selector) }}" class="add"><i
+                                <a href="{{ Selector::url($column, $value, false, $selector) }}" class="add"><i
                                         class="fa fa-plus-square-o"></i></a>
                             @else
                                 <a style="visibility: hidden;"><i class="fa fa-plus-square-o"></i></a>
@@ -85,7 +88,7 @@
                         </li>
                     @endforeach
                     <li>
-                        <a href="{{ \WenRuns\Service\Grid\Tools\Selector::url($column, null, false, $selector) }}" class="clear"><i
+                        <a href="{{ Selector::url($column, null, false, $selector) }}" class="clear"><i
                                 class="fa fa-trash"></i></a>
                     </li>
                 </ul>

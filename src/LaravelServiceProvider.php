@@ -3,7 +3,9 @@
 namespace WenRuns\Laravel;
 
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
 use Illuminate\Support\ServiceProvider;
+use WenRuns\Laravel\Admin\Form\Field\MultiList\MultiList;
 
 class LaravelServiceProvider extends ServiceProvider
 {
@@ -12,12 +14,15 @@ class LaravelServiceProvider extends ServiceProvider
      */
     public function boot(Laravel $extension)
     {
+        $this->handle();
+
         if (!Laravel::boot()) {
             return;
         }
 
         if ($views = $extension->views()) {
-            $this->loadViewsFrom($views, 'laravel-service');
+            $this->loadViewsFrom($views, 'WenRuns');
+            $this->loadViewsFrom($views.'/admin', 'WenAdmin');
         }
 
         if ($this->app->runningInConsole() && $assets = $extension->assets()) {
@@ -36,9 +41,7 @@ class LaravelServiceProvider extends ServiceProvider
     public function handle()
     {
         Admin::booting(function () {
-            Admin::js('vendor/wenruns/laravel-service/layer/layer.js');
-            Admin::js('vendor/wenruns/laravel-service/layer/mobile/layer.js');
-            Admin::css('vendor/wenruns/laravel-service/layer/mobile/need/layer.css');
+            Form::extend('multiList', MultiList::class);
         });
     }
 }

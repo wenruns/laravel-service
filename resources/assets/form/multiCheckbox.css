@@ -1,0 +1,160 @@
+.sub-options-box li {
+    list-style: none;
+    margin: .5em 0px;
+    padding: 0px;
+}
+
+.sub-options-box {
+    padding: 0px;
+    margin: 0px 0px 0px 2em;
+}
+
+.one-option-box {
+    display: flex;
+}
+
+.select2-box-wen {
+    position: relative;
+}
+
+.sub-box-wen {
+    width: 100%;
+    position: absolute;
+    /*top: calc(100% + 0.1em);*/
+    left: 0px;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.sub-box-wen-top {
+    bottom: calc(100% + 0.1em);
+}
+
+.sub-box-wen-bottom {
+    /*top: calc(100% + 0.1em);*/
+    top: 1px;
+}
+
+.checkbox-options-box-wen{
+    position: relative;
+}
+
+.show-checked-box-wen {
+    min-height: 50px;
+    width: 100%;
+}
+
+.checked-content-box-wen {
+    width: 100%;
+    height: 200px;
+}
+
+
+.sub-box-checkbox-wen {
+    border: 1px solid lightskyblue;
+    /*box-shadow: 0px 0px 2px deepskyblue;*/
+    background: whitesmoke;
+    padding: 1em;
+}
+
+.sub-box-checkbox-wen > ul {
+    margin: 0px;
+}
+
+
+.checkbox-box-wen {
+    position: relative;
+    width: 2em;
+}
+
+.checkbox-input-wen,
+.checkbox-fake-box {
+    display: block;
+    width: 1.5em;
+    height: 1.5em;
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: deepskyblue;
+    z-index: 99;
+}
+
+.checkbox-input-wen:checked + .checkbox-fake-box::before {
+    display: block;
+    content: "\2713";
+    text-align: center;
+    font-size: 16px;
+    color: white;
+}
+
+.checkbox-input-wen {
+    visibility: hidden;
+}
+
+.last-level-box {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.last-level-box > li {
+    margin-left: 1em;
+}
+
+.last-level-box > li:nth-child(1) {
+    margin-left: 0px;
+}
+
+.show-checked-box-wen .sub-box-checkbox-wen {
+    /*box-shadow: 0px 0px 2px gray;*/
+}
+
+.sub-box-scroll {
+    box-shadow: 0px 0px 2px gray;
+}
+
+.show-checked-box-wen .checkbox-fake-box {
+    background: red;
+}
+
+.hide {
+    visibility: hidden;
+}
+
+.title-box-wen {
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: red;
+    background: lightblue;
+    box-shadow: 0px 0px 2px lightskyblue;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    line-height: 35px;
+    font-weight: bold;
+}
+
+.sub-options-box-tttt {
+    padding: 25px 0px;
+    box-sizing: border-box;
+}
+
+.sub-options-box-tttt > .sub-options-box-bbbb {
+    overflow: auto;
+}
+
+.sub-box-wen-tips-box {
+    padding: 25px 0px;
+    box-sizing: border-box;
+    background: whitesmoke;
+}
+
+.sub-box-wen-tips-box .tips {
+    text-align: center;
+    color: gray;
+    font-size: 2em;
+}
+

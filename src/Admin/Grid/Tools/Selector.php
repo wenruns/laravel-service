@@ -44,7 +44,7 @@ class Selector extends \Encore\Admin\Grid\Tools\Selector
      */
     public function render()
     {
-        return view('laravel-service::grid.selector', [
+        return view('WenAdmin::grid.selector', [
             'selectors' => $this->selectors,
             'selected' => static::parseSelected(),
         ]);

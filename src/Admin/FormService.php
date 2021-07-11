@@ -170,7 +170,11 @@ class FormService
      * @param $actionUrl
      * @return $this
      */
+<<<<<<< HEAD
     public function actionUrl($actionUrl)
+=======
+    public function actions($actionUrl)
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     {
         $this->form->setAction($actionUrl);
         return $this;

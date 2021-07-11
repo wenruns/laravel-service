@@ -2,7 +2,12 @@
     <label for="{{$id}}" class="{{$viewClass['label']}} control-label">{{$showLabel?$label:' '}}</label>
     <div class="{{$viewClass['field']}}">
         @include('admin::form.error')
+<<<<<<< HEAD
         <div class="checkbox-{{$unique}}" id="checkbox-{{$unique}}"></div>
+=======
+        <div class="checkbox-{{$unique}}" id="checkbox-{{$unique}}">
+        </div>
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         @include('admin::form.help-block')
     </div>
 </div>
@@ -31,7 +36,11 @@
 </script>
 
 <style>
+<<<<<<< HEAD
     .checkbox-{{$unique}}{
+=======
+    .checkbox-{{$unique}}             {
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         overflow: auto;
         max-width: {{$maxWidth}};
         max-height: {{$maxHeight}};

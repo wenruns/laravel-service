@@ -13,7 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Encore\Admin\Form\Field;
+<<<<<<< HEAD
 use WenRuns\Laravel\Laravel;
+=======
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
 
 class MultiCheckbox extends Field
 {
@@ -57,6 +60,10 @@ class MultiCheckbox extends Field
      */
     protected static $css = [
         '/vendor/laravel-admin/AdminLTE/plugins/select2/select2.min.css',
+<<<<<<< HEAD
+=======
+        '/vendor/wenruns/laravel-service/form/multiCheckbox.css'
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     ];
 
     /**
@@ -64,6 +71,10 @@ class MultiCheckbox extends Field
      */
     protected static $js = [
         '/vendor/laravel-admin/AdminLTE/plugins/select2/select2.full.min.js',
+<<<<<<< HEAD
+=======
+        '/vendor/wenruns/laravel-service/form/multiCheckbox.js',
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     ];
 
     /**
@@ -75,12 +86,19 @@ class MultiCheckbox extends Field
     public function __construct($column = '', array $arguments = [])
     {
         $this->unique_key = mt_rand(1000, 9999);
+<<<<<<< HEAD
         Laravel::loadCss('form/multiCheckbox.js');
         Laravel::loadJs('form/multiCheckbox.css');
+=======
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         parent::__construct($column, $arguments);
     }
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     /**
      * @param $attachData
      * @return $this
@@ -190,9 +208,15 @@ class MultiCheckbox extends Field
             'url' => $url . '?' . http_build_query($parameters),
         ];
         $configs = array_merge([
+<<<<<<< HEAD
             'allowClear' => true,
             'placeholder' => [
                 'id' => '',
+=======
+            'allowClear'  => true,
+            'placeholder' => [
+                'id'   => '',
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
                 'text' => trans('admin.choose'),
             ],
         ], $this->config);
@@ -368,9 +392,15 @@ EOT;
     public function render()
     {
         $configs = array_merge([
+<<<<<<< HEAD
             'allowClear' => true,
             'placeholder' => [
                 'id' => '',
+=======
+            'allowClear'  => true,
+            'placeholder' => [
+                'id'   => '',
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
                 'text' => $this->label,
             ],
         ], $this->config);
@@ -392,12 +422,21 @@ EOT;
         $this->options = array_filter($this->options, 'strlen');
 
         $this->addVariables([
+<<<<<<< HEAD
             'options' => $this->options,
             'unique_key' => $this->unique_key,
             'request_url' => $this->request_url,
             'checked_values' => $this->defaultCheckedValue(),
             'format' => $this->dataFormat,
             'attach' => is_array($this->attach) ? json_encode($this->attach) : $this->attach,
+=======
+            'options'        => $this->options,
+            'unique_key'     => $this->unique_key,
+            'request_url'    => $this->request_url,
+            'checked_values' => $this->defaultCheckedValue(),
+            'format'         => $this->dataFormat,
+            'attach'         => is_array($this->attach) ? json_encode($this->attach) : $this->attach,
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         ]);
         $this->attribute('data-value', implode(',', $this->checked_values));
         return parent::render();

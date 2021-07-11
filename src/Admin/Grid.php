@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use WenRuns\Laravel\Admin\Grid\Column;
 use WenRuns\Laravel\Admin\Grid\Tools\Header;
 use WenRuns\Laravel\Admin\Grid\Tools\Selector;
+<<<<<<< HEAD
 use WenRuns\Laravel\Laravel;
 
 class Grid extends \Encore\Admin\Grid
@@ -19,6 +20,11 @@ class Grid extends \Encore\Admin\Grid
 
     protected $view = 'WenAdmin::grid.table';
 
+=======
+
+class Grid extends \Encore\Admin\Grid
+{
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     /**
      * Get the string contents of the grid view.
      *
@@ -36,6 +42,10 @@ class Grid extends \Encore\Admin\Grid
 
         $this->callRenderingCallback();
 
+<<<<<<< HEAD
+=======
+//        dd($this->view, $this->variables(),$this);
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         return Admin::component($this->view, $this->variables());
     }
 
@@ -226,6 +236,7 @@ class Grid extends \Encore\Admin\Grid
 
         return (new Header($this))->render();
     }
+<<<<<<< HEAD
 
     /**
      * @param $columns
@@ -275,4 +286,6 @@ SCRIPT;
         return $this;
     }
 
+=======
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
 }

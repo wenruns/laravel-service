@@ -11,7 +11,10 @@ namespace WenRuns\Laravel\Admin\Form\Field;
 
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form\Field;
+<<<<<<< HEAD
 use WenRuns\Laravel\Laravel;
+=======
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
 
 class ApiSelect extends Field
 {
@@ -91,6 +94,16 @@ class ApiSelect extends Field
     protected $totalPages = 0;
 
     /**
+<<<<<<< HEAD
+=======
+     * @var string[]
+     */
+    protected static $js = [
+        '/vendor/wenruns/laravel-service/form/selector.js',
+    ];
+
+    /**
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
      * ApiSelect constructor.
      * @param string $column
      * @param array $arguments
@@ -99,7 +112,10 @@ class ApiSelect extends Field
     {
         $this->uniqueKey = mt_rand(100000, 999999);
         $this->placeholder = '请选择 ' . $this->label;
+<<<<<<< HEAD
         Laravel::loadJs('form/selector.js');
+=======
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         parent::__construct($column, $arguments);
     }
 
@@ -231,12 +247,17 @@ class ApiSelect extends Field
     }
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
      */
     public function render()
     {
         $this->addVariables([
+<<<<<<< HEAD
             'options' => json_encode($this->options),
             'uniqueKey' => $this->uniqueKey,
             'url' => $this->uri,
@@ -253,6 +274,24 @@ class ApiSelect extends Field
             'pagination' => $this->pagination,
             'perPage' => $this->perPage,
             'totalPages' => $this->totalPages,
+=======
+            'options'       => json_encode($this->options),
+            'uniqueKey'     => $this->uniqueKey,
+            'url'           => $this->uri,
+            'method'        => $this->method,
+            'attach'        => json_encode($this->attach),
+            'isMultiple'    => $this->isMultiple,
+            'values'        => json_encode(is_array($this->value) ? $this->value : [$this->value]),
+            'changed'       => $this->_changed,
+            'updated'       => $this->_updated,
+            'beforeUpdate'  => $this->_beforeUpdate,
+            'beforeClear'   => $this->_beforeClear,
+            'cleared'       => $this->_cleared,
+            'defaultSelect' => $this->_defaultSelect,
+            'pagination'    => $this->pagination,
+            'perPage'       => $this->perPage,
+            'totalPages'    => $this->totalPages,
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         ]);
 //        dd($this->variables());
         return parent::render();

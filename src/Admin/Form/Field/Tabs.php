@@ -9,8 +9,13 @@
 namespace WenRuns\Laravel\Admin\Form\Field;
 
 
+<<<<<<< HEAD
 use Encore\Admin\Form\Field;
 use WenRuns\Laravel\Admin\Form;
+=======
+use Encore\Admin\Form;
+use Encore\Admin\Form\Field;
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
 
 class Tabs extends Field
 {
@@ -51,8 +56,11 @@ class Tabs extends Field
 
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     /**
      * @param array $arguments
      * @return string

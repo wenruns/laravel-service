@@ -48,7 +48,7 @@ class LaravelServiceProvider extends ServiceProvider
     public function handle()
     {
         Form::extend('multiList', MultiList::class);
-        Form::extend('tabs', Tabs::class);
+        Form::extend('wenTab', Tabs::class);
         Form::extend('apiSelect', ApiSelect::class);
         Form::extend('checkboxTree', CheckboxTree::class);
         Form::extend('inputSelect', InputSelect::class);

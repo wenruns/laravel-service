@@ -14,11 +14,7 @@ use Encore\Admin\Grid;
 class GridService
 {
     /**
-<<<<<<< HEAD
      * @var null | \WenRuns\Laravel\Admin\Grid |Grid
-=======
-     * @var Grid|null
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
      */
     protected $grid = null;
 
@@ -42,11 +38,7 @@ class GridService
      */
     protected $actionsClosure = [
         'closure' => null,
-<<<<<<< HEAD
         'options' => ['edit' => true, 'view' => true, 'delete' => true],
-=======
-        'options' => ['edit' => false, 'view' => false, 'delete' => false],
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     ];
 
     /**
@@ -110,7 +102,6 @@ class GridService
         return $this;
     }
 
-<<<<<<< HEAD
     /**
      * @param string $columns
      * @param string $javascriptFn
@@ -122,8 +113,6 @@ class GridService
         $this->grid->mergeColspan(...func_get_args());
         return $this;
     }
-=======
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
 
     /**
      * @param \Closure $closure
@@ -196,7 +185,6 @@ class GridService
     }
 
     /**
-<<<<<<< HEAD
      * @param  \Closure|null|array $actions
      * @param array $options
      * @return $this
@@ -205,16 +193,6 @@ class GridService
     {
         $this->actionsClosure = [
             'closure' => $actions,
-=======
-     * @param \Closure $closure
-     * @return $this
-     */
-    public function actions(\Closure $closure = null, $options = ['edit' => false, 'view' => false, 'delete' => false])
-    {
-
-        $this->actionsClosure = [
-            'closure' => $closure,
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
             'options' => $options,
         ];
 
@@ -323,16 +301,11 @@ class GridService
      */
     public function render()
     {
-<<<<<<< HEAD
         if ($this->grid->option('show_define_empty_page')) {
             self::showEmptyPage();
         }
         $actionsOption = $this->actionsClosure;
 //        $batchActionsClosure = $this->batchActionsClosure;
-=======
-        $actionsOption = $this->actionsClosure;
-        $batchActionsClosure = $this->batchActionsClosure;
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         $this->checkInit()
             ->header($this->headerClosure ?? function () {
                 })
@@ -341,7 +314,6 @@ class GridService
             ->actions(function (Grid\Displayers\Actions $actions) use ($actionsOption) {
                 $closure = $actionsOption['closure'] ?? null;
                 $options = $actionsOption['options'] ?? [];
-<<<<<<< HEAD
                 if (is_array($closure)) {
                     $options = $closure;
                     $closure = null;
@@ -349,33 +321,20 @@ class GridService
                 $enableEdit = $options['edit'] ?? empty($closure) && empty($options);
                 $enableView = $options['view'] ?? empty($closure) && empty($options);
                 $enableDelete = $options['delete'] ?? empty($closure) && empty($options);
-=======
-                $enableEdit = $options['edit'] ?? false;
-                $enableView = $options['view'] ?? false;
-                $enableDelete = $options['delete'] ?? false;
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
                 $enableView || $actions->disableView();
                 $enableDelete || $actions->disableDelete();
                 $enableEdit || $actions->disableEdit();
                 if (is_callable($closure)) {
                     $closure->call($this, $actions);
                 }
-<<<<<<< HEAD
             });
         if (is_callable($this->toolsClosure)) {
             $this->grid->tools($this->toolsClosure);
         }
-
-=======
-            })
-            ->tools($this->toolsClosure ?? function () {
-                });
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         return $this->grid;
     }
 
     /**
-<<<<<<< HEAD
      * @param string $selector
      */
     public static function showEmptyPage($selector = '.table-wrap.table-main')
@@ -413,8 +372,6 @@ HTML;
     }
 
     /**
-=======
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
      * @param $modelClass
      * @param string $gridClass
      * @return static

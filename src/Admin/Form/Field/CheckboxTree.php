@@ -220,6 +220,9 @@ class CheckboxTree extends Field
      */
     public function options($options = [])
     {
+        if(is_callable($options)){
+            $options = call_user_func($options, $this);
+        }
         $this->options = $options;
         return $this;
     }

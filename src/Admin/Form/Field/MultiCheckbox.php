@@ -122,6 +122,10 @@ class MultiCheckbox extends Field
             return $this->loadRemoteOptions(...func_get_args());
         }
 
+        if(is_callable($options)){
+            $options = call_user_func($options, $this);
+        }
+
         if ($options instanceof Arrayable) {
             $options = $options->toArray();
         }

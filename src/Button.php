@@ -122,11 +122,6 @@ class Button
     const TYPE_PRIMARY = 'primary';
     const TYPE_INFO = 'info';
 
-<<<<<<< HEAD
-=======
-    protected static $hasLoadLayer = false;
-
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
     /**
      * Button constructor.
      * @param $text
@@ -143,24 +138,8 @@ class Button
 
     public function checkAssets()
     {
-<<<<<<< HEAD
         Laravel::loadJs('layui/layui.js');
         Laravel::loadCss('layui/css/layui.css');
-=======
-        if (self::$hasLoadLayer) {
-            return $this;
-        }
-        $js = Admin::js()->getData()['js'] ?? [];
-        foreach ($js as $file) {
-            if (strpos($file, 'layer.js') !== false) {
-                self::$hasLoadLayer = true;
-                return $this;
-            }
-        }
-        Admin::js('/vendor/wenruns/laravel-service/layer/layer.js');
-        Admin::js('/vendor/wenruns/laravel-service/layer/mobile/layer.js');
-        Admin::css('/vendor/wenruns/laravel-service/layer/mobile/need/layer.css');
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         return $this;
     }
 
@@ -570,10 +549,6 @@ SCRIPT;
             $options['script'] .= $field->getScript() . ' ';
         });
         $area = is_array($options['area']) ? json_encode($options['area']) : $options['area'];
-<<<<<<< HEAD
-
-=======
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
         return <<<SCRIPT
 function(e, pJax){
     layer.open({
@@ -670,15 +645,9 @@ SCRIPT;
         return [
             'submitEvent' => $options['submit'] ?? '',
             'script' => $options['script'] ?? '',
-<<<<<<< HEAD
             'area' => $options['area'] ?? ['95%', '95%'],
             'offset' => $options['offset'] ?? '2%',
             'anim' => $options['anim'] ?? 2,
-=======
-            'area' => $options['area'] ?? ['80vw', '90vh'],
-            'offset' => $options['offset'] ?? '5px',
-            'anim' => $options['anim'] ?? 1,
->>>>>>> adb22b581a67098d408abc23d6a26ccf56eef808
             'title' => $options['title'] ?? false,
             'shadeClose' => $options['shadeClose'] ?? true,
             'shade' => $options['shade'] ?? 0.3,

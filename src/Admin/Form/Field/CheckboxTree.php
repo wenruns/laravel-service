@@ -9,7 +9,6 @@
 namespace WenRuns\Laravel\Admin\Form\Field;
 
 
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form\Field;
 use WenRuns\Laravel\Laravel;
 
@@ -219,6 +218,9 @@ class CheckboxTree extends Field
      */
     public function options($options = [])
     {
+        if(is_callable($options)){
+            $options = call_user_func($options, $this);
+        }
         $this->options = $options;
         return $this;
     }

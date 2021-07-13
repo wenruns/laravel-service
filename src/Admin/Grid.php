@@ -234,7 +234,7 @@ class Grid extends \Encore\Admin\Grid
      * @param int $mergeInput
      * @return $this
      */
-    public function mergeColspan($columns, $javascriptFn = 'false', $mergeInput = 2)
+    public function mergeColspan($columns='*', $javascriptFn = 'false', $mergeInput = 2)
     {
         $this->addMergeColspanScript(...func_get_args());
         return $this;
@@ -275,5 +275,6 @@ SCRIPT;
         Admin::script($script);
         return $this;
     }
+
 
 }

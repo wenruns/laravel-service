@@ -9,7 +9,6 @@
 namespace WenRuns\Laravel\Admin\Form\Field;
 
 
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form\Field;
 use WenRuns\Laravel\Laravel;
 

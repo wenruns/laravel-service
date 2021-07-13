@@ -184,8 +184,6 @@ class MultiList extends Field
     }
 
 
-
-
     /**
      * 检测--值
      * @return mixed
@@ -258,9 +256,9 @@ class MultiList extends Field
             $this->setWidth($width, $label);
         }
         $this->addVariables([
-                '__content__' => $this->getContent(),
-                'tableKey' => $this->getTableList()->getTableKey()
-            ])
+            '__content__' => $this->getContent(),
+            'tableKey' => $this->getTableList()->getTableKey()
+        ])
             ->addRequiredAttributeFromRules();
         Admin::script($this->script);
         return view($this->getView(), $this->variables());
@@ -350,12 +348,16 @@ HTML;
      */
     public function options($options = [])
     {
+        if (is_callable($options)) {
+            $options = call_user_func($options, $this);
+        }
         if ($options instanceof Arrayable) {
             $options = $options->toArray();
         }
         if (!$this->is2Array($options)) {
             $options = [$options];
         }
+
         $this->options = array_merge($this->options, $options);
         return $this;
     }

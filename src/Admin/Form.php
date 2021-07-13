@@ -9,6 +9,7 @@
 namespace WenRuns\Laravel\Admin;
 
 
+use Closure;
 use WenRuns\Laravel\Admin\Form\Field\ApiSelect;
 use WenRuns\Laravel\Admin\Form\Field\CheckboxTree;
 use WenRuns\Laravel\Admin\Form\Field\InputSelect;
@@ -24,9 +25,12 @@ use WenRuns\Laravel\Admin\Form\Field\Tabs;
  * @method CheckboxTree     checkboxTree($column, $label = '')
  * @method InputSelect      inputSelect($column, $label = '')
  * @method MultiCheckbox    multiCheckbox($column, $label = '')
- * @method Tabs             tabs($title, \Closure $closure)
+ * @method Tabs             wenTab($title, \Closure $closure)
  */
 class Form extends \Encore\Admin\Form
 {
-
+    public function __construct($model, Closure $callback = null)
+    {
+        parent::__construct($model, $callback);
+    }
 }
